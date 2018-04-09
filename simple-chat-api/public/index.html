@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href='https://fonts.googleapis.com/css?family=Amatic SC' rel='stylesheet'>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Chat App</title>
+  <script src="app.js" charset="utf-8"></script>
+  <script>
+
+  var localUser;
+
+  // checks if user is unique, then let the user join the chat or pick another username
+  function joinChat(user){
+    if(Chat.isUserUnique(user)){
+      Chat.joinChat(user);
+
+      localUser = user;
+      updateUsers();
+      document.getElementById("formJoin").style.display = 'none';
+      document.getElementById("logoutbtn").style.display = 'inline-block';
+    } else {
+      alert("Username is taken - Pick another one");
+    }
+  }
+
+  function updateUsers(){
+    var localUsers = Chat.getUsers();
+    var arrayLength = localUsers.length;
+    document.getElementById('active_users').innerHTML = "";
+    for (var i = 0; i < arrayLength; i++){
+      document.getElementById('active_users').innerHTML += '<li class="list-group-item">' + localUsers[i] + "</li>";
+    }
+
+  }
+  //creating a msg
+  function sendMsg(message){
+    if(localUser != null){
+      var messageObj = {text:message, author:localUser, date: Date()};
+      Chat.sendMsg(messageObj);
+      updateMsg();
+
+    }else{
+      alert("Please log in to post messages");
+    }
+  }
+
+  //show new messages
+  function updateMsg(){
+    var localMessages = Chat.getCensoredMessages();
+    var arrayLength = localMessages.length;
+    document.getElementById('chat_messages').innerHTML = "";
+    for (var i = 0; i < arrayLength; i++){
+      var d = new Date(localMessages[i].date);
+      document.getElementById('chat_messages').innerHTML += '<li class="list-group-item">' + d.getHours()+ ":" + d.getMinutes() + "<b> " + localMessages[i].author + ":</b> " + localMessages[i].text + " " + "</li>";
+    }
+  }
+
+  // remove user from users array, update the list of users in html, reset the user object
+  function logout(){
+    Chat.logout(localUser);
+    updateUsers();
+    localUser = null;
+    document.getElementById("formJoin").style.display = 'inline-block';
+    document.getElementById("logoutbtn").style.display = 'none';
+  }
+
+  function search(query){
+    alert(Chat.search(query));
+  }
+  </script>
+</head>
+<body>
+
+  <h1>Chat-Room</h1>
+  <div id="menu" >
+
+    <form id="formJoin" class="form-inline" action="javascript:joinChat(username.value)">
+      <input type="text" placeholder="Username" name="username" id="username" class="form-control">
+      <input type="password" placeholder="Password" name="password" class="form-control">
+      <input type="submit" style="visibility: hidden; display: none;" />
+    </form>
+
+    <form id="formSearch" action="javascript:search(query.value)">
+      <input type="text" placeholder="Search" name="query" id="query" class="form-control">
+    </form>
+
+    <button type="button" class="btn-link" id="logoutbtn">Logout</button>
+  </div>
+  <br><br><br>
+
+  <div id="messages_div">
+    <h2>Messages:</h2>
+    <div id="inner_messages_div">
+      <ul id="chat_messages" class="list-group">
+      </ul>
+    </div>
+    <form id="formSendMsg" action="javascript:sendMsg(message.value)">
+      Message: <input type="text" name="message" id="message" class="form-control">
+
+    </form>
+  </div>
+
+  <div id="userlist" class="list-group">
+    <h2>Active users:</h2>
+    <ul id="active_users">
+    </ul>
+  </div>
+
+  <script>
+  document.getElementById("logoutbtn").style.display = 'none';
+  document.getElementById("logoutbtn").addEventListener("click", logout);
+  </script>
+</body>
+</html>
