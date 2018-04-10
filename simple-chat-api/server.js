@@ -10,6 +10,24 @@ app.use(express.json())
 // Serve static files from public folder
 app.use(express.static('public'))
 
+const Sequelize = require('sequelize') // $ npm install sequelize
+const sequelize = new Sequelize('sqlite:./data/database.sqlite', {
+  logging: console.log
+})
+
+const ChatMessages =
+sequelize.define('chatmessages', {
+  id: {
+            type: Sequelize.INTEGER,
+            autoIncrement: true,
+            primaryKey: true
+        },
+  author: Sequelize.STRING,
+  message: Sequelize.TEXT
+})
+
+sequelize.sync()
+
 // Simple in-memory storage
 // Note: Will be lost when script is terminated
 let messages = []
@@ -18,7 +36,13 @@ let messages = []
 // Returns all messages
 app.get('/api/messages', (req, res) => {
     // Return a JSON response to the GET request
-    res.json(messages)
+    var messagesResult;
+    ChatMessages.findAll().then(messagesResult => {
+      console.log(messagesResult);
+      res.json(messagesResult);
+  // projects will be an array of all Project instances
+})
+
 })
 
 // GET /api/messages/:id endpoint
@@ -26,8 +50,11 @@ app.get('/api/messages', (req, res) => {
 app.get('/api/messages/:id', (req, res) => {
     // Find first message that matches the ID from the route
     // Documentation: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
-    let message = messages.find(m => m.id == req.params.id)
+    //let message = messages.find(m => m.id == req.params.id)
 
+    ChatMessages.findById(req.params.id).then(message => {
+
+    })
     // If a message is found, display it
     // Otherwise return a 404 with a not found message
     if (message) {
@@ -51,16 +78,13 @@ app.post('/api/messages', (req, res) => {
         })
     }
 
-    // Construct a simple message object
-    let message = {
-        id: messages.length + 1,
-        text: req.body.text,
+    ChatMessages.sync().then(() => {
+      // Table created
+      return ChatMessages.create({
         author: req.body.author,
-        date: new Date()
-    }
-
-    // Push the message object into the messages array
-    messages.push(message)
+        message: req.body.text
+      });
+    });
 
     // Return a status 201 (created) response
     res.status(201).json({
@@ -103,6 +127,12 @@ app.delete('/api/messages/:id', (req, res) => {
     // Keep all messages except the one specified
     // in the route parameter
     messages = messages.filter(m => m != req.params.id)
+
+    ChatMessages.destroy({
+  where: {
+    id: req.params.id
+  }
+});
 
     res.json({
         message: 'OK'

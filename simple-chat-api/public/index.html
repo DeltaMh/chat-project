@@ -11,7 +11,8 @@
   <script src="app.js" charset="utf-8"></script>
   <script>
 
-  var localUser;
+  var localUser = 'Dimitra';
+  setInterval(updateMsg, 1000);
 
   // checks if user is unique, then let the user join the chat or pick another username
   function joinChat(user){
@@ -36,6 +37,11 @@
     }
 
   }
+function deleteMsg(id){
+  Chat.deleteMessage(id);
+  console.log('Tried to delete');
+}
+
   //creating a msg
   function sendMsg(message){
     if(localUser != null){
@@ -50,12 +56,14 @@
 
   //show new messages
   function updateMsg(){
-    var localMessages = Chat.getCensoredMessages();
+    Chat.getMessages();
+    var localMessages = Chat.getLocalMessages();
+
     var arrayLength = localMessages.length;
     document.getElementById('chat_messages').innerHTML = "";
     for (var i = 0; i < arrayLength; i++){
       var d = new Date(localMessages[i].date);
-      document.getElementById('chat_messages').innerHTML += '<li class="list-group-item">' + d.getHours()+ ":" + d.getMinutes() + "<b> " + localMessages[i].author + ":</b> " + localMessages[i].text + " " + "</li>";
+      document.getElementById('chat_messages').innerHTML += '<li class="list-group-item">' + d.getHours()+ ":" + d.getMinutes() + "<b> " + localMessages[i].author + ":</b> " + localMessages[i].message + " " + "</li>";
     }
   }
 
@@ -102,6 +110,21 @@
       Message: <input type="text" name="message" id="message" class="form-control">
 
     </form>
+  </div>
+
+  <div id="edit_div">
+
+    <h2>Delete message</h2>
+    <form id="formDeleteMsg" action="javascript:deleteMsg(messageid.value)">
+      Message ID: <input type="text" name="messageid" id="messageid" class="form-control">
+    </form>
+
+  <h2>Update message</h2>
+    <form id="formUpdateMsg" action="javascript:updateMsg(messageid2.value, messagecontent.value)">
+      Message ID: <input type="text" name="messageid2" id="messageid2" class="form-control">
+      Message Content: <input type="text" name="messagecontent" id="messagecontent" class="form-control">
+    </form>
+
   </div>
 
   <div id="userlist" class="list-group">

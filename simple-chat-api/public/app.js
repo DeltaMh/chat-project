@@ -3,11 +3,14 @@ var Chat = (function () {
   let users = []
   let messages = []
   let banned_words = ["university", "exams", "diet", "carbohydrates"]
+  let localMessages = []
   let module = {}
+
   // gives back users
   module.getUsers = function () {
     return users;
   }
+  module.getLocalMessages = function () {return localMessages;}
   //searches to the full length of the messages and concatenates any matching results and return them
   module.search = function(query){
     var arrayLength = messages.length;
@@ -63,34 +66,58 @@ var Chat = (function () {
   //returns all the messages, returns the 10 latest messages
   module.getMessages = function () {
 
+
   fetch('/api/messages')
   .then(response => response.json())
   .then(data => {
     messages = data;
-    alert(JSON.stringify(data));
-    alert(messages);
 
       // Display the fetched messages in the browser
+      var msgs_to_censor;
+      var max_messages = 10;
+      if(messages.length > max_messages){
+        var latest_messages = messages.slice(messages.length -max_messages, messages.length);
+
+        msgs_to_censor = latest_messages;
+      }else{
+
+        msgs_to_censor = messages
+      }
+
+
+      var arrayLength = msgs_to_censor.length;
+      for (var m = 0; m < arrayLength; m++){
+        for (var b = 0; b < banned_words.length; b++){
+          msgs_to_censor[m].message = msgs_to_censor[m].message.replace(banned_words[b], "****")
+
+
+        }
+      }
+      localMessages = msgs_to_censor;
+
     })
 
-    var max_messages = 10;
-    if(messages.length > max_messages){
-      var latest_messages = messages.slice(messages.length -max_messages, messages.length);
-      return latest_messages;
-    }else{return messages}
-  }
-  //censors words and replaces them with 4*
-  module.getCensoredMessages = function () {
-    var msgs_to_censor = Chat.getMessages();
-    var arrayLength = msgs_to_censor.length;
-    for (var m = 0; m < arrayLength; m++){
-      for (var b = 0; b < banned_words.length; b++){
-        msgs_to_censor[m].text = msgs_to_censor[m].text.replace(banned_words[b], "****")
-        console.log(banned_words[b] + " " + msgs_to_censor[m].text);
 
+  }
+
+  module.deleteMessage = function (id) {
+    console.log(id);
+    var sendObj = {};
+    sendObj.id = parseInt(id);
+    console.log(JSON.stringify(sendObj));
+    fetch('/api/messages/' + id, {
+      method: 'delete',
+      credentials: 'include',
+      body: JSON.stringify(sendObj),
+      headers: {
+          'content-type': 'application/json'
       }
-    }
-    return msgs_to_censor;
+  })
+  .then(response => response.json())
+  .then(data => {
+      // Do something when the message was saved
+      // Perhaps clear the input field or remove a loading indicator
+})
   }
 
   return module
