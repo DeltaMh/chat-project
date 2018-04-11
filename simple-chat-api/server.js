@@ -51,19 +51,19 @@ app.get('/api/messages/:id', (req, res) => {
     // Find first message that matches the ID from the route
     // Documentation: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
     //let message = messages.find(m => m.id == req.params.id)
-
+    var message;
     ChatMessages.findById(req.params.id).then(message => {
-
+      // If a message is found, display it
+      // Otherwise return a 404 with a not found message
+      if (message) {
+          res.json(message)
+      } else {
+          res.status(404).json({
+              message: 'Message not found!'
+          })
+      }
     })
-    // If a message is found, display it
-    // Otherwise return a 404 with a not found message
-    if (message) {
-        res.json(message)
-    } else {
-        res.status(404).json({
-            message: 'Message not found!'
-        })
-    }
+
 })
 
 // POST /api/messages endpoint

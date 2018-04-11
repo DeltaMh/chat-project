@@ -12,7 +12,8 @@ var Chat = (function () {
   }
   module.getLocalMessages = function () {return localMessages;}
   //searches to the full length of the messages and concatenates any matching results and return them
-  module.search = function(query){
+  module.search = async function(query){
+    /*
     var arrayLength = messages.length;
     var result = "";
     for (var i = 0; i < arrayLength; i++){
@@ -21,6 +22,11 @@ var Chat = (function () {
       }
     }
     return result;
+    */
+
+    let response = await fetch('/api/messages/' + query);
+    return await response.json();
+
   }
   //removes a user from the users array
   module.logout = function (user) {

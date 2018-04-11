@@ -76,9 +76,13 @@ function deleteMsg(id){
     document.getElementById("logoutbtn").style.display = 'none';
   }
 
-  function search(query){
-    alert(Chat.search(query));
+  async function search(query){
+
+      let ourResponse = await Chat.search(query);
+      console.log(ourResponse);
+      alert(ourResponse.message);
   }
+
   </script>
 </head>
 <body>
