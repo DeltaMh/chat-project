@@ -41,6 +41,10 @@ function deleteMsg(id){
   Chat.deleteMessage(id);
   console.log('Tried to delete');
 }
+function changeMsg(id, message){
+  alert(id + " " + message )
+  Chat.updateMessage(id, message)
+}
 
   //creating a msg
   function sendMsg(message){
@@ -62,7 +66,7 @@ function deleteMsg(id){
     var arrayLength = localMessages.length;
     document.getElementById('chat_messages').innerHTML = "";
     for (var i = 0; i < arrayLength; i++){
-      var d = new Date(localMessages[i].date);
+      var d = new Date(localMessages[i].createdAt);
       document.getElementById('chat_messages').innerHTML += '<li class="list-group-item">' + d.getHours()+ ":" + d.getMinutes() + "<b> " + localMessages[i].author + ":</b> " + localMessages[i].message + " " + "</li>";
     }
   }
@@ -80,7 +84,7 @@ function deleteMsg(id){
 
       let ourResponse = await Chat.search(query);
       console.log(ourResponse);
-      alert(ourResponse.message);
+      alert(ourResponse.author + ": " + ourResponse.message);
   }
 
   </script>
@@ -124,9 +128,10 @@ function deleteMsg(id){
     </form>
 
   <h2>Update message</h2>
-    <form id="formUpdateMsg" action="javascript:updateMsg(messageid2.value, messagecontent.value)">
+    <form id="formUpdateMsg" action="javascript:changeMsg(messageid2.value, messagecontent.value)">
       Message ID: <input type="text" name="messageid2" id="messageid2" class="form-control">
       Message Content: <input type="text" name="messagecontent" id="messagecontent" class="form-control">
+      <input type="submit">
     </form>
 
   </div>

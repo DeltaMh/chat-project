@@ -95,30 +95,17 @@ app.post('/api/messages', (req, res) => {
 // PUT /api/messages/:id endpoint
 // Updates a message
 app.put('/api/messages/:id', (req, res) => {
-    // Have the message been updated?
-    let updated = false
+    console.log("Was called");
 
-    // Go through the messages
-    // and update the specific message with the ID
-    // from the route parameter
-    messages.map(m => {
-        if (m.id == req.params.id) {
-            m.text = req.body.text
-            updated = true
-        }
+
+    const newData = {
+      message: req.body.text
+    };
+
+    ChatMessages.update(newData, {where: { id: req.params.id } })
+    .then(updatedMessage => {
+      console.log(updatedMessage)
     })
-
-    // Different responses depending on whether
-    // or not the message was updated
-    if (updated) {
-        res.json({
-            message: 'Message updated'
-        })
-    } else {
-        res.status(400).json({
-            message: 'Error updating message'
-        })
-    }
 })
 
 // DELETE /api/messages/:id

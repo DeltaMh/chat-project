@@ -126,5 +126,21 @@ var Chat = (function () {
 })
   }
 
+  module.updateMessage = function(id, message){
+    console.log(id + " " + message);
+    var sendObj = {};
+    sendObj.id = parseInt(id);
+    sendObj.text = message;
+    console.log(JSON.stringify(sendObj));
+    fetch('/api/messages/' + id, {
+      method: 'put',
+      credentials: 'include',
+      body: JSON.stringify(sendObj),
+      headers: {
+          'content-type': 'application/json'
+      }
+  })
+  }
+
   return module
 })()
